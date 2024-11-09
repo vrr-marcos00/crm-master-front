@@ -1,8 +1,16 @@
-import Chat from "@/components/Chat";
+// Context
+import { BaileysProvider } from "../../../context/BaileysContext";
+
+// Components
+import Chat from "./components/Chat";
 
 const ChatApp = () => {
+  const userId = "123456";
+
   return (
-    <Chat />
+    <BaileysProvider userId={userId}>
+      <Chat />
+    </BaileysProvider>
   );
 };
 

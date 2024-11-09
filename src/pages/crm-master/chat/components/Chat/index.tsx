@@ -1,4 +1,4 @@
-// components/Chat.tsx
+// React
 import { useEffect, useState } from 'react';
 
 interface Contact {
@@ -11,7 +11,7 @@ interface Message {
   key: {
     fromMe: boolean;
   };
-  message: { conversation?: string, extendedTextMessage?: { text: string }};
+  message: { conversation?: string, extendedTextMessage?: { text: string } };
 }
 
 const Chat = () => {
@@ -19,40 +19,44 @@ const Chat = () => {
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState<string>('');
-  const [loading, setLoading] = useState(false);
 
-  console.log("contacts", contacts);
-  console.log("MESSAGES", messages);
+  const isBaileysReady = false;
+  const syncSuccess = true;
 
-  // Função para carregar contatos com retry
   useEffect(() => {
-    const loadContacts = async () => {
-      setLoading(true);
+    const initializerBaileys = async () => {
       try {
-        const res = await fetch('/api/whatsapp?action=getContacts');
-        if (res.status === 503) {
-          // Tenta novamente após 1 segundo se o socket não estiver pronto
-          setTimeout(loadContacts, 1000);
-        } else if (res.ok) {
-          const data = await res.json();
-          setContacts(data.contacts);
-        } else {
-          console.error('Erro ao carregar contatos:', await res.text());
-        }
+        await fetch('/api/whatsapp?action=initializerBaileys&userId=123456', {
+          method: 'POST'
+        });
       } catch (error) {
         console.error('Erro ao carregar contatos:', error);
-      } finally {
-        setLoading(false);
+      }
+    };
+
+    initializerBaileys();
+  }, []);
+
+  useEffect(() => {
+    const loadContacts = async () => {
+      if (isBaileysReady) {
+        try {
+          const res = await fetch('/api/whatsapp?action=getContacts&userId=123456');
+          const data = await res.json();
+          setContacts(data.contacts);
+        } catch (error) {
+          console.error('Erro ao carregar contatos:', error);
+        }
       }
     };
 
     loadContacts();
-  }, []);
+  }, [isBaileysReady]);
 
   // Função para carregar histórico de mensagens ao selecionar um contato
   const selectChat = async (jid: string) => {
     setSelectedChat(jid);
-    
+
     try {
       const res = await fetch(`/api/whatsapp?action=getChatHistory&jid=${jid}`);
       if (res.ok) {
@@ -77,15 +81,18 @@ const Chat = () => {
     setMessageText('');
     setMessages((prevMessages) => [
       ...prevMessages,
-      { message: { conversation: messageText }, key: { fromMe: true }},
+      { message: { conversation: messageText }, key: { fromMe: true } },
     ]);
   };
+
+  console.log("SYNC", syncSuccess);
+  console.log("IS REASY BAILEYS", isBaileysReady);
 
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '30%', borderRight: '1px solid #ddd', padding: '10px' }}>
         <h3>Contatos</h3>
-        {loading && <p>Carregando contatos...</p>}
+        {!syncSuccess && <p>Carregando contatos...</p>}
         <ul>
           {contacts?.map((contact) => (
             <li key={contact.id} onClick={() => selectChat(contact.id)}>
@@ -102,7 +109,7 @@ const Chat = () => {
             <div style={{ maxHeight: '400px', overflowY: 'scroll' }}>
               {messages.map((msg, idx) => (
                 <p key={idx} style={{ textAlign: msg?.key?.fromMe ? 'right' : 'left' }}>
-                  {msg?.message?.conversation || msg?.message?.extendedTextMessage?.text }
+                  {msg?.message?.conversation || msg?.message?.extendedTextMessage?.text}
                 </p>
               ))}
             </div>

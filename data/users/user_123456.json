@@ -1,0 +1,21 @@
+{
+  "messages": [
+    {
+      "key": {
+        "remoteJid": "556184880278@s.whatsapp.net",
+        "fromMe": true,
+        "id": "3ACB5D9C7053A78278FB"
+      },
+      "messageTimestamp": 1731124392,
+      "pushName": "Marcos  Sá",
+      "broadcast": false,
+      "status": 2,
+      "message": {
+        "conversation": "Olá",
+        "messageContextInfo": {
+          "messageSecret": "wGTFl1HYv4LEYpOiBFj9RdCf7Ic/OXOa+AqOJZTWhRc="
+        }
+      }
+    }
+  ]
+}
